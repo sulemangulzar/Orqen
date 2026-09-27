@@ -9,15 +9,21 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.20.0",
+    "asyncpg>=0.31.0",
     "fastapi>=0.141.1",
+    "pydantic-settings>=2.15.0",
     "sqlalchemy>=2.0.54",
     "sqlmodel>=0.0.47",
     "uvicorn[standard]>=0.54.0",
 ]
 
 [project.scripts]
-backend = "backend:main"
+backend = "app.main:main"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "app"
+module-root = ""

@@ -8,4 +8,10 @@ app = FastAPI(
 
 @app.get("/")
 def health():
-    return {"message" : "running"}
+    return {"message": "running"}
+
+
+def main() -> None:
+    import uvicorn
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000)
