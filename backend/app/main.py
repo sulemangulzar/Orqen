@@ -1,17 +1,19 @@
 from fastapi import FastAPI
 
+from app.api.v1.endpoints.auth import router as auth_router
+from app.api.v1.endpoints.user import router as user_router
+
+from app.core.config import settings
+
 app = FastAPI(
-    title="Orqen",
-    version="0.1.0",
-    description="AI Operation Copilot"
+    title=settings.app_name, version="0.1.0", description="AI Operation Copilot",
 )
 
-@app.get("/")
+app.include_router(auth_router)
+app.include_router(user_router)
+
+
+
+@app.get("/", tags=["Health"])
 def health():
-    return {"message": "running"}
-
-
-def main() -> None:
-    import uvicorn
-
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000)
+    return {"message": settings.app_name + " is Running"}
