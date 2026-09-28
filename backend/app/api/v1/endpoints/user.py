@@ -14,3 +14,7 @@ async def update_user(user_id: uuid.UUID):
 async def delete_user(user_id: uuid.UUID):
   """Soft-delete or remove a user from the organization."""
   pass
+
+@router.post("/invitations/accept")
+async def accept_invite(user_id: uuid.UUID):
+  pass
