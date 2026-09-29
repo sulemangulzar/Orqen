@@ -12,6 +12,7 @@ from alembic import context
 from app.models.organization import Organization
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
+from app.models.invitation import Invitation
 
 
 # this is the Alembic Config object, which provides
