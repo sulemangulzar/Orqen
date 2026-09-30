@@ -1,22 +1,45 @@
-import base64
 import hashlib
-import hmac
-import json
 import secrets
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+import jwt
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError, VerificationError
+
 from app.core.config import settings
+
+password_hasher = PasswordHasher()
+JWT_ALGORITHM = "HS256"
 
 
 def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+    return password_hasher.hash(password)
 
 
 def verify_password(password: str, hashed_password: str | None) -> bool:
     if hashed_password is None:
         return False
-    return hash_password(password) == hashed_password
+
+    # temporary support for old local SHA-256 hashes created before Argon2
+    if len(hashed_password) == 64:
+        return hashlib.sha256(password.encode("utf-8")).hexdigest() == hashed_password
+
+    try:
+        return password_hasher.verify(hashed_password, password)
+    except (VerifyMismatchError, VerificationError):
+        return False
+
+
+def password_needs_rehash(hashed_password: str | None) -> bool:
+    if hashed_password is None:
+        return False
+    if len(hashed_password) == 64:
+        return True
+    try:
+        return password_hasher.check_needs_rehash(hashed_password)
+    except Exception:
+        return True
 
 
 def hash_token(token: str) -> str:
@@ -32,35 +55,23 @@ def create_refresh_token() -> str:
 
 
 def create_access_token(user_id: UUID) -> str:
+    now = datetime.now(timezone.utc)
     payload = {
         "sub": str(user_id),
-        "exp": int((datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_minutes)).timestamp()),
+        "iat": now,
+        "exp": now + timedelta(minutes=settings.access_token_minutes),
+        "type": "access",
     }
-    payload_json = json.dumps(payload, separators=(",", ":")).encode("utf-8")
-    payload_b64 = base64.urlsafe_b64encode(payload_json).decode("utf-8").rstrip("=")
-    signature = hmac.new(
-        settings.auth_secret.encode("utf-8"),
-        payload_b64.encode("utf-8"),
-        hashlib.sha256,
-    ).hexdigest()
-    return f"{payload_b64}.{signature}"
+    return jwt.encode(payload, settings.auth_secret, algorithm=JWT_ALGORITHM)
 
 
 def verify_access_token(token: str) -> UUID | None:
     try:
-        payload_b64, signature = token.split(".", 1)
-        expected_signature = hmac.new(
-            settings.auth_secret.encode("utf-8"),
-            payload_b64.encode("utf-8"),
-            hashlib.sha256,
-        ).hexdigest()
-        if not hmac.compare_digest(signature, expected_signature):
-            return None
-
-        padded_payload = payload_b64 + "=" * (-len(payload_b64) % 4)
-        payload = json.loads(base64.urlsafe_b64decode(padded_payload))
-        if int(payload["exp"]) < int(datetime.now(timezone.utc).timestamp()):
+        payload = jwt.decode(token, settings.auth_secret, algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "access":
             return None
         return UUID(payload["sub"])
-    except Exception:
+    except jwt.PyJWTError:
+        return None
+    except (KeyError, ValueError):
         return None

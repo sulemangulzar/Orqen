@@ -13,6 +13,7 @@ from app.core.security import (
     create_refresh_token,
     hash_password,
     hash_token,
+    password_needs_rehash,
     verify_access_token,
     verify_password,
 )
@@ -136,6 +137,11 @@ class AuthService:
 
         if not user.is_verified:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Please confirm your email before logging in")
+
+        if password_needs_rehash(user.hashed_password):
+            user.hashed_password = hash_password(payload.password)
+            user.updated_at = datetime.now(timezone.utc)
+            user = await self.repository.save_user(user)
 
         return await self._issue_session(user)
 
