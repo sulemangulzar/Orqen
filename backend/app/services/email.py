@@ -1,4 +1,5 @@
 import json
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from app.core.config import settings
@@ -14,7 +15,7 @@ class EmailService:
         await self._send(email, "Reset your Orqen password", f"Reset your password: {link}")
 
     async def _send(self, to: str, subject: str, text: str) -> None:
-        if settings.resend_api_key is None:
+        if not settings.resend_api_key:
             print(f"[email dev] to={to} subject={subject} body={text}")
             return
 
@@ -35,5 +36,11 @@ class EmailService:
                 "Content-Type": "application/json",
             },
         )
-        with urlopen(request, timeout=10) as response:
-            response.read()
+
+        try:
+            with urlopen(request, timeout=10) as response:
+                response.read()
+        except HTTPError as exc:
+            print(f"[email fallback] Resend HTTP {exc.code}. to={to} subject={subject} body={text}")
+        except URLError as exc:
+            print(f"[email fallback] Resend failed: {exc}. to={to} subject={subject} body={text}")
