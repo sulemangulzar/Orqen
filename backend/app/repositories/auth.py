@@ -19,6 +19,24 @@ class AuthRepository:
         result = await self.session.exec(select(User).where(User.email == email))
         return result.first()
 
+    async def get_user_by_provider(self, provider: str, provider_id: str) -> User | None:
+        result = await self.session.exec(
+            select(User).where(User.auth_provider == provider, User.provider_id == provider_id)
+        )
+        return result.first()
+
+    async def get_user_by_email_verification_token(self, token_hash: str) -> User | None:
+        result = await self.session.exec(
+            select(User).where(User.email_verification_token_hash == token_hash)
+        )
+        return result.first()
+
+    async def get_user_by_password_reset_token(self, token_hash: str) -> User | None:
+        result = await self.session.exec(
+            select(User).where(User.password_reset_token_hash == token_hash)
+        )
+        return result.first()
+
     async def create_user(self, user: User) -> User:
         try:
             self.session.add(user)
@@ -28,6 +46,12 @@ class AuthRepository:
         except IntegrityError:
             await self.session.rollback()
             raise
+
+    async def save_user(self, user: User) -> User:
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
 
     async def create_refresh_token(self, refresh_token: RefreshToken) -> RefreshToken:
         self.session.add(refresh_token)

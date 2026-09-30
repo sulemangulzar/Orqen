@@ -28,3 +28,8 @@ class InvitationStatus(str, Enum):
   ACCEPTED = "accepted"
   REVOKED = "revoked"
   EXPIRED = "expired"
+
+
+class AuthProvider(str, Enum):
+  EMAIL = "email"
+  GOOGLE = "google"
