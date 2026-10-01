@@ -1,8 +1,9 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Alert } from '../components/Alert';
 import { AuthLayout } from '../components/AuthLayout';
 import { Button } from '../components/Button';
-import { Input } from '../components/Input';
+import { Input, PasswordInput } from '../components/Input';
 import { api } from '../lib/api';
 import { setAccessToken } from '../lib/auth';
 import { navigate } from '../lib/router';
@@ -12,36 +13,67 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  async function onSubmit(event: FormEvent) {
+  const emailError = submitted && !email.trim()
+    ? 'Enter your email address.'
+    : (submitted || email.length > 0) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      ? 'Enter a valid email address.'
+      : undefined;
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSubmitted(true);
     setError('');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || !password) return;
+
     setLoading(true);
     try {
-      const result = await api.login({ email, password });
+      const result = await api.login({ email: email.trim(), password });
       setAccessToken(result.access_token);
       navigate(result.needs_onboarding ? '/onboarding' : '/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : 'We could not sign you in. Check your details and try again.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Log in after confirming your email to continue to onboarding.">
-      <form onSubmit={onSubmit} className="space-y-4">
+    <AuthLayout title="Welcome back" subtitle="Sign in to continue to your Orqen workspace.">
+      <form onSubmit={onSubmit} noValidate className="space-y-4">
         {error && <Alert tone="error" message={error} />}
-        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="you@company.com" />
-        <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Your password" />
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          inputMode="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+          placeholder="you@company.com"
+          error={emailError}
+        />
+        <PasswordInput
+          label="Password"
+          name="current-password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+          placeholder="Your password"
+          error={submitted && !password ? 'Enter your password.' : undefined}
+        />
         <div className="flex justify-end">
-          <button type="button" onClick={() => navigate('/forgot-password')} className="text-sm font-semibold text-teal-600 dark:text-teal-300">Forgot password?</button>
+          <button type="button" onClick={() => navigate('/forgot-password')} className="text-xs font-semibold text-[var(--brand-blue)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-blue)]">Forgot password?</button>
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Logging in...' : 'Log in'}</Button>
-        <Button type="button" variant="secondary" className="w-full" onClick={() => setError('Google sign-in is ready in backend. Add your Google button/client ID next.')}>Continue with Google</Button>
+        <Button type="submit" className="w-full rounded-lg bg-[var(--navy-950)] py-3.5 hover:bg-[var(--navy-800)]" disabled={loading}>
+          {loading ? 'Signing in…' : 'Sign in'}
+        </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-        New to Orqen? <button onClick={() => navigate('/signup')} className="font-semibold text-teal-600 dark:text-teal-300">Create account</button>
+      <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
+        New to Orqen? <button type="button" onClick={() => navigate('/signup')} className="font-semibold text-[var(--brand-blue)] hover:underline">Create an account</button>
       </p>
     </AuthLayout>
   );

@@ -1,13 +1,14 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'dark';
   children: ReactNode;
 };
 
 const variants = {
-  primary: 'bg-slate-950 text-white shadow-lg shadow-slate-950/15 hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100',
-  secondary: 'border border-slate-200 bg-white/80 text-slate-900 hover:-translate-y-0.5 hover:border-slate-300 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10',
+  primary: 'bg-[#111827] text-white shadow-[0_16px_40px_rgba(15,23,42,0.18)] hover:-translate-y-0.5 hover:bg-black dark:bg-white dark:text-[#0b1020] dark:hover:bg-slate-100',
+  dark: 'bg-black text-white shadow-[0_18px_45px_rgba(0,0,0,0.25)] hover:-translate-y-0.5 hover:bg-[#15151a]',
+  secondary: 'border border-slate-200 bg-white/75 text-slate-900 shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10',
   ghost: 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10',
 };
 

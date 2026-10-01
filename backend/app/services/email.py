@@ -34,13 +34,24 @@ class EmailService:
             headers={
                 "Authorization": f"Bearer {settings.resend_api_key}",
                 "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "Orqen/0.1 (+https://testiforge.com)",
             },
         )
 
         try:
             with urlopen(request, timeout=10) as response:
-                response.read()
+                response_body = response.read().decode("utf-8")
+                print(f"[email sent] to={to} subject={subject} response={response_body}")
         except HTTPError as exc:
-            print(f"[email fallback] Resend HTTP {exc.code}. to={to} subject={subject} body={text}")
+            error_body = exc.read().decode("utf-8", errors="replace")
+            print(
+                f"[email fallback] Resend HTTP {exc.code}. "
+                f"from={settings.email_from} to={to} subject={subject} "
+                f"error={error_body} body={text}"
+            )
         except URLError as exc:
-            print(f"[email fallback] Resend failed: {exc}. to={to} subject={subject} body={text}")
+            print(
+                f"[email fallback] Resend failed: {exc}. "
+                f"from={settings.email_from} to={to} subject={subject} body={text}"
+            )
