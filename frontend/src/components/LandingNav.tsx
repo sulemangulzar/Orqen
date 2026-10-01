@@ -37,16 +37,16 @@ export function LandingNav() {
           </button>
         </div>
 
-        <button onClick={() => setOpen(!open)} aria-expanded={open} aria-label="Toggle navigation" className="grid h-10 w-10 place-items-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-primary)] md:hidden">
+        <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close navigation' : 'Open navigation'} className="grid h-10 w-10 place-items-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-primary)] transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-blue)] md:hidden">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {open && (
         <div className="border-t border-[var(--border-subtle)] bg-white px-5 py-5 md:hidden">
-          <nav className="mx-auto flex max-w-[1200px] flex-col" aria-label="Mobile navigation">
+          <nav id="mobile-navigation" className="mx-auto flex max-w-[1200px] flex-col" aria-label="Mobile navigation">
             {links.map(([label, href]) => (
-              <a key={label} href={href} onClick={() => setOpen(false)} className="border-b border-[var(--border-subtle)] py-4 text-sm font-medium text-[var(--text-primary)]">{label}</a>
+              <a key={label} href={href} onClick={() => setOpen(false)} className="border-b border-[var(--border-subtle)] py-4 text-sm font-medium text-[var(--text-primary)] transition-colors hover:text-[var(--brand-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-blue)]">{label}</a>
             ))}
             <div className="mt-5 grid grid-cols-2 gap-3">
               <button onClick={() => navigate('/login')} className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-semibold">Login</button>
