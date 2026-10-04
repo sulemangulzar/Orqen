@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 290" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Orqen logo</title>
+  <defs>
+    <linearGradient id="main" x1="29" y1="29" x2="282" y2="233" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10183D"/>
+      <stop offset="0.32" stop-color="#133D9D"/>
+      <stop offset="0.59" stop-color="#1777F6"/>
+      <stop offset="0.80" stop-color="#3D79FF"/>
+      <stop offset="1" stop-color="#AD80F1"/>
+    </linearGradient>
+    <linearGradient id="lower" x1="117" y1="267" x2="295" y2="183" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0866EC"/>
+      <stop offset="0.42" stop-color="#536EFF"/>
+      <stop offset="1" stop-color="#B28AF2"/>
+    </linearGradient>
+    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(74 240) rotate(-54) scale(179 146)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#399BFC" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#399BFC" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Main arc with a deliberately open lower-right end. -->
+  <path d="M151 10C72 10 8 72 8 151c0 58 30 104 85 126l25-51c-32-14-51-43-51-78 0-47 36-82 83-82 48 0 85 37 85 85 0 9-1 16-3 23h67c1-7 1-15 1-23C300 72 233 10 151 10Z" fill="url(#main)"/>
+  <path d="M151 10C72 10 8 72 8 151c0 58 30 104 85 126l25-51c-32-14-51-43-51-78 0-47 36-82 83-82 48 0 85 37 85 85 0 9-1 16-3 23h67c1-7 1-15 1-23C300 72 233 10 151 10Z" fill="url(#light)"/>
+  <!-- Independent lower stroke, separated by the white diagonal cutout. -->
+  <path d="M109 281h67c57 0 105-37 119-91h-63c-34 0-62 15-81 44l-42 47Z" fill="url(#lower)"/>
+</svg>

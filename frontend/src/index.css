@@ -27,6 +27,17 @@
   font-family: Georgia, "Times New Roman", ui-serif, serif;
 }
 
+.logo-gradient {
+  background: linear-gradient(135deg, #101d50 0%, #0755ed 40%, #428bfa 70%, #9a77f5 100%);
+}
+
+.brand-underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.1em;
+  text-decoration-color: #c8d6ff;
+}
+
 .dark {
   color-scheme: dark;
   background: #020617;

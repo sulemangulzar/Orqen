@@ -1,100 +1,43 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { Building2, Check, ClipboardList, Sparkles } from 'lucide-react';
-import { Alert } from '../components/Alert';
+import { useEffect, useState } from 'react';
+import { ArrowRight, Check, Link2, MailPlus, SkipForward, Users, Workflow } from 'lucide-react';
+import { AuthLayout } from '../components/AuthLayout';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { Logo } from '../components/Logo';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { api } from '../lib/api';
 import { getAccessToken } from '../lib/auth';
 import { navigate } from '../lib/router';
 
+const steps = ['Create organization', 'Invite your team', 'Connect tools', 'Enter workspace'];
+
 export function Onboarding() {
-  const [step, setStep] = useState(1);
-  const [company, setCompany] = useState('');
-  const [website, setWebsite] = useState('');
-  const [teamSize, setTeamSize] = useState('');
-  const [goal, setGoal] = useState('');
-  const [error, setError] = useState('');
+  const [step, setStep] = useState(0);
+  const [organization, setOrganization] = useState('');
+  const [slug, setSlug] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [country, setCountry] = useState('');
+  const [emails, setEmails] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const token = getAccessToken();
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+    if (!token) { navigate('/login'); return; }
     api.me(token).catch(() => navigate('/login'));
   }, []);
 
-  function next(event: FormEvent) {
-    event.preventDefault();
-    setError('');
-    if (step < 3) setStep(step + 1);
-    else setError('Onboarding backend is next. These details are ready to submit once the organization endpoint is created.');
+  function next() {
+    setMessage('');
+    if (step === 0 && !organization.trim()) { setMessage('Add an organization name to continue.'); return; }
+    if (step < steps.length - 1) setStep((value) => value + 1);
+    else navigate('/dashboard');
   }
 
-  return (
-    <main className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-white">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Logo />
-        <ThemeToggle />
-      </header>
-      <section className="mx-auto grid max-w-6xl gap-8 px-6 py-10 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-[2rem] border border-slate-200 bg-white/70 p-6 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-sm font-semibold text-teal-600 dark:text-teal-300">Workspace onboarding</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight">Teach Orqen how your operations run.</h1>
-          <p className="mt-4 text-slate-600 dark:text-slate-400">We’ll turn your workspace details into the starting point for your AI operation copilot.</p>
-          <div className="mt-8 space-y-3">
-            {[
-              [Building2, 'Company basics'],
-              [ClipboardList, 'Operational priorities'],
-              [Sparkles, 'AI copilot setup'],
-            ].map(([Icon, label], index) => (
-              <div key={String(label)} className={`flex items-center gap-3 rounded-2xl p-3 ${step >= index + 1 ? 'bg-teal-500/10 text-teal-700 dark:text-teal-200' : 'bg-slate-100 text-slate-500 dark:bg-white/5'}`}>
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-white dark:bg-white/10">
-                  {step > index + 1 ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
-                </div>
-                <span className="font-medium">{String(label)}</span>
-              </div>
-            ))}
-          </div>
-        </aside>
-
-        <form onSubmit={next} className="rounded-[2rem] border border-slate-200 bg-white/80 p-6 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-white/[0.04] sm:p-8">
-          {error && <div className="mb-5"><Alert tone="info" message={error} /></div>}
-          {step === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Company basics</h2>
-              <Input label="Company name" value={company} onChange={(e) => setCompany(e.target.value)} required placeholder="Acme Operations" />
-              <Input label="Website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://acme.com" />
-              <Input label="Team size" value={teamSize} onChange={(e) => setTeamSize(e.target.value)} placeholder="1-10, 11-50, 51-200" />
-            </div>
-          )}
-          {step === 2 && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">What should Orqen improve first?</h2>
-              {['Customer onboarding', 'Internal approvals', 'Weekly reporting', 'Ticket triage'].map((item) => (
-                <button key={item} type="button" onClick={() => setGoal(item)} className={`w-full rounded-2xl border p-4 text-left transition ${goal === item ? 'border-teal-400 bg-teal-500/10' : 'border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:bg-white/5'}`}>{item}</button>
-              ))}
-            </div>
-          )}
-          {step === 3 && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Ready to create your operations cockpit</h2>
-              <div className="rounded-2xl bg-slate-100 p-5 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">
-                <p><strong>Company:</strong> {company || 'Not set'}</p>
-                <p><strong>Website:</strong> {website || 'Not set'}</p>
-                <p><strong>Team size:</strong> {teamSize || 'Not set'}</p>
-                <p><strong>First priority:</strong> {goal || 'Not set'}</p>
-              </div>
-            </div>
-          )}
-          <div className="mt-8 flex justify-between">
-            <Button type="button" variant="secondary" onClick={() => (step === 1 ? navigate('/') : setStep(step - 1))}>Back</Button>
-            <Button type="submit">{step === 3 ? 'Finish onboarding' : 'Continue'}</Button>
-          </div>
-        </form>
-      </section>
-    </main>
-  );
+  return <AuthLayout title={step === 3 ? 'Your workspace is ready.' : 'Set up your workspace.'} subtitle={step === 3 ? 'This is where your team will organize everyday business operations.' : 'A few details will help shape your first Orqen workspace.'}>
+    <div className="mb-8 grid grid-cols-4 gap-2">{steps.map((label, index) => <div key={label}><div className={`h-1 rounded-full ${index <= step ? 'bg-[var(--brand-blue)]' : 'bg-slate-200'}`} /><p className={`mt-2 hidden text-[9px] font-semibold sm:block ${index <= step ? 'text-[var(--brand-blue)]' : 'text-slate-400'}`}>{label}</p></div>)}</div>
+    {message && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">{message}</p>}
+    {step === 0 && <div className="space-y-4"><Input label="Organization name" value={organization} onChange={(event) => setOrganization(event.target.value)} placeholder="Your company" required /><Input label="Workspace slug" value={slug} onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/\s+/g, '-'))} placeholder="your-company" /><div className="grid gap-4 sm:grid-cols-2"><Input label="Industry" value={industry} onChange={(event) => setIndustry(event.target.value)} placeholder="Retail, services…" /><Input label="Country" value={country} onChange={(event) => setCountry(event.target.value)} placeholder="United States" /></div><p className="text-[11px] leading-5 text-[var(--text-soft)]">Organization creation will be connected when the backend onboarding endpoint is enabled.</p></div>}
+    {step === 1 && <div className="space-y-5"><div className="grid h-11 w-11 place-items-center rounded-xl bg-[#edf3ff] text-[var(--brand-blue)]"><MailPlus className="h-5 w-5" /></div><div><h2 className="text-xl font-semibold tracking-[-.03em]">Invite your team</h2><p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">Add work emails separated by commas. This step is optional and can be done later.</p></div><Input label="Team email addresses" value={emails} onChange={(event) => setEmails(event.target.value)} placeholder="alex@company.com, sam@company.com" /><div className="flex items-center gap-2 text-xs text-[var(--text-soft)]"><Users className="h-4 w-4" /> Invitations will be available once the backend endpoint is connected.</div></div>}
+    {step === 2 && <div className="space-y-4"><div><h2 className="text-xl font-semibold tracking-[-.03em]">Connect your tools</h2><p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">Connect supported business tools now or return to this step later.</p></div>{[['Shopify','Orders and customer activity'],['Slack','Team updates and notifications']].map(([name, detail]) => <div key={name} className="flex items-center gap-3 rounded-xl border border-[var(--border-subtle)] p-4"><div className="grid h-9 w-9 place-items-center rounded-lg bg-slate-50 text-[var(--brand-blue)]"><Link2 className="h-4 w-4" /></div><div className="flex-1"><p className="text-sm font-semibold">{name}</p><p className="mt-1 text-xs text-[var(--text-muted)]">{detail}</p></div><span className="text-[10px] font-semibold text-[var(--text-soft)]">Coming soon</span></div>)}</div>}
+    {step === 3 && <div className="rounded-xl border border-[var(--border-subtle)] bg-[#f7f9fc] p-5"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--navy-950)] text-white"><Workflow className="h-5 w-5" /></div><h2 className="mt-5 text-xl font-semibold">Welcome to {organization || 'your workspace'}.</h2><p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">Your connected place for customers, orders, tasks, and team activity.</p><div className="mt-5 space-y-3 text-xs text-[var(--text-secondary)]">{['Workspace details saved for setup','Team invitations can be added later','Integrations can be connected when available'].map((item) => <div key={item} className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-emerald-600" />{item}</div>)}</div></div>}
+    <div className="mt-8 flex items-center justify-between gap-3"><button type="button" onClick={() => step === 0 ? navigate('/') : setStep((value) => value - 1)} className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)]">{step === 0 ? 'Back home' : 'Back'}</button><div className="flex gap-2">{step > 0 && step < 3 && <button type="button" onClick={() => setStep((value) => value + 1)} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-semibold text-[var(--text-muted)]"><SkipForward className="h-3.5 w-3.5" /> Skip</button>}<Button type="button" onClick={next}>{step === 3 ? 'Enter workspace' : 'Continue'} <ArrowRight className="ml-1 h-3.5 w-3.5" /></Button></div></div>
+  </AuthLayout>;
 }

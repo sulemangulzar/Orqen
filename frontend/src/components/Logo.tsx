@@ -1,5 +1,3 @@
-import orqenLogo from '../assets/orqen_logo.png';
-
 type LogoProps = {
   className?: string;
   markOnly?: boolean;
@@ -7,38 +5,17 @@ type LogoProps = {
   inverted?: boolean;
 };
 
-const frames = {
-  sm: 'h-7 w-[112px]',
-  md: 'h-9 w-[144px]',
-  lg: 'h-14 w-[224px]',
-};
-
-const images = {
-  sm: 'w-[160px] -left-[25px] -top-[25px]',
-  md: 'w-[206px] -left-[32px] -top-[32px]',
-  lg: 'w-[320px] -left-[49px] -top-[49px]',
-};
+const markSizes = { sm: 'h-8 w-8', md: 'h-10 w-10', lg: 'h-14 w-14' };
+const wordSizes = { sm: 'text-xl', md: 'text-2xl', lg: 'text-4xl' };
 
 export function Logo({ className = '', markOnly = false, size = 'md', inverted = false }: LogoProps) {
-  if (markOnly) {
-    return (
-      <div className={`relative h-10 w-10 overflow-hidden ${className}`}>
-        <img
-          src={orqenLogo}
-          alt="Orqen"
-          className="absolute -left-[13px] -top-[31px] w-[178px] max-w-none"
-        />
-      </div>
-    );
-  }
+  const mark = <img src="/orqen-logo.svg" alt="" aria-hidden="true" className={`${markSizes[size]} shrink-0 ${inverted ? 'brightness-0 invert' : ''}`} />;
+  if (markOnly) return <span className={className} aria-label="Orqen">{mark}</span>;
 
   return (
-    <div className={`relative overflow-hidden ${frames[size]} ${inverted ? 'mix-blend-screen' : ''} ${className}`}>
-      <img
-        src={orqenLogo}
-        alt="Orqen"
-        className={`absolute max-w-none ${images[size]} ${inverted ? 'brightness-0 invert' : ''}`}
-      />
-    </div>
+    <span className={`inline-flex items-center gap-2 ${className}`}>
+      {mark}
+      <span className={`font-semibold leading-none tracking-[-.04em] ${wordSizes[size]} ${inverted ? 'text-white' : 'text-[#10183d]'}`}>Orqen</span>
+    </span>
   );
 }

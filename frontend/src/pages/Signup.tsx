@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { Check } from 'lucide-react';
+import { useState } from 'react';
 import { Alert } from '../components/Alert';
 import { AuthLayout } from '../components/AuthLayout';
 import { Button } from '../components/Button';
 import { Input, PasswordInput } from '../components/Input';
 import { api } from '../lib/api';
-import { navigate } from '../lib/router';
 
 export function Signup() {
   const [fullName, setFullName] = useState('');
@@ -43,10 +43,10 @@ export function Signup() {
   }
 
   return (
-    <AuthLayout title="Create your account" subtitle="Set up your Orqen account. You can create or join a workspace after confirming your email.">
-      <form onSubmit={onSubmit} noValidate className="space-y-4">
-        {error && <Alert tone="error" message={error} />}
-        {success && <Alert tone="success" message={success} />}
+    <AuthLayout title="Create your Orqen account." subtitle="Start with a workspace built around customers, orders, ownership, and follow-through.">
+      <form onSubmit={onSubmit} noValidate className="grid gap-4 sm:grid-cols-2">
+        {error && <div className="sm:col-span-2"><Alert tone="error" message={error} /></div>}
+        {success && <div className="sm:col-span-2"><Alert tone="success" message={success} /></div>}
         <Input
           label="Full name"
           name="name"
@@ -92,14 +92,18 @@ export function Signup() {
           placeholder="Enter your password again"
           error={confirmError}
         />
-        <Button type="submit" className="mt-2 w-full rounded-lg bg-[var(--navy-950)] py-3.5 hover:bg-[var(--navy-800)]" disabled={loading || Boolean(success)}>
+        <Button type="submit" className="mt-2 w-full rounded-lg py-3.5 sm:col-span-2" disabled={loading || Boolean(success)}>
           {loading ? 'Creating account…' : 'Create account'}
         </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-        Already have an account? <button type="button" onClick={() => navigate('/login')} className="font-semibold text-[var(--brand-blue)] hover:underline">Sign in</button>
-      </p>
-
+      <div className="mt-5 grid gap-2 rounded-lg bg-slate-50 px-3 py-3 text-xs text-[var(--text-muted)] sm:grid-cols-3">
+        {['Shared context', 'Team ownership', 'Clear handoffs'].map((item) => (
+          <span key={item} className="flex items-center gap-1.5">
+            <Check className="h-3.5 w-3.5 text-[var(--brand-blue)]" />
+            {item}
+          </span>
+        ))}
+      </div>
     </AuthLayout>
   );
 }

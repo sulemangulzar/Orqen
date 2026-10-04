@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Cookie, Header, Response, status
+from fastapi import APIRouter, Cookie, Depends, Header, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api import SessionDep
 from app.core.config import settings
@@ -56,6 +57,19 @@ async def resend_confirmation(payload: ResendConfirmationRequest, session: Sessi
 
 @router.post("/login", response_model=LoginResponse)
 async def login(payload: LoginRequest, response: Response, session: SessionDep):
+    login_response, refresh_token = await get_auth_service(session).login(payload)
+    set_refresh_cookie(response, refresh_token)
+    return login_response
+
+
+@router.post("/token", response_model=LoginResponse)
+async def token(
+    response: Response,
+    session: SessionDep,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
+    """OAuth2 password-flow token endpoint for Swagger, Scalar, and API clients."""
+    payload = LoginRequest(email=form_data.username, password=form_data.password)
     login_response, refresh_token = await get_auth_service(session).login(payload)
     set_refresh_cookie(response, refresh_token)
     return login_response

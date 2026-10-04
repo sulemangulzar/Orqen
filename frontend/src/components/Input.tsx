@@ -8,7 +8,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   hint?: string;
 };
 
-const inputStyles = 'w-full rounded-lg border border-[var(--border-strong)] bg-white px-3.5 py-3 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-slate-400 focus:border-[var(--brand-blue)] focus:ring-4 focus:ring-[var(--brand-blue)]/10';
+const inputStyles = 'w-full rounded-lg border border-slate-200 bg-white px-3.5 py-3 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--brand-blue)] focus:ring-4 focus:ring-blue-500/10';
 
 export function Input({ label, className = '', error, hint, id, ...props }: InputProps) {
   const inputId = id ?? props.name ?? label.toLowerCase().replaceAll(' ', '-');
@@ -20,7 +20,7 @@ export function Input({ label, className = '', error, hint, id, ...props }: Inpu
         id={inputId}
         aria-invalid={Boolean(error)}
         aria-describedby={error || hint ? helpId : undefined}
-        className={`${inputStyles} ${error ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : ''} ${className}`}
+          className={`${inputStyles} ${error ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : ''} ${className}`}
         {...props}
       />
       {(error || hint) && <span id={helpId} className={`mt-1.5 block text-xs ${error ? 'text-rose-600' : 'text-[var(--text-muted)]'}`}>{error ?? hint}</span>}
@@ -51,7 +51,7 @@ export function PasswordInput({ label, className = '', error, hint, id, ...props
           aria-pressed={visible}
           className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-lg text-[var(--text-soft)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand-blue)]"
         >
-          {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
         </button>
       </span>
       {(error || hint) && <span id={helpId} className={`mt-1.5 block text-xs ${error ? 'text-rose-600' : 'text-[var(--text-muted)]'}`}>{error ?? hint}</span>}

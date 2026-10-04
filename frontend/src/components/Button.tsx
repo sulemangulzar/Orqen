@@ -6,7 +6,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variants = {
-  primary: 'bg-[#111827] text-white shadow-[0_16px_40px_rgba(15,23,42,0.18)] hover:-translate-y-0.5 hover:bg-black dark:bg-white dark:text-[#0b1020] dark:hover:bg-slate-100',
+  primary: 'logo-gradient text-white shadow-[0_16px_40px_rgba(15,23,42,0.18)] hover:-translate-y-0.5 hover:brightness-110',
   dark: 'bg-black text-white shadow-[0_18px_45px_rgba(0,0,0,0.25)] hover:-translate-y-0.5 hover:bg-[#15151a]',
   secondary: 'border border-slate-200 bg-white/75 text-slate-900 shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10',
   ghost: 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10',

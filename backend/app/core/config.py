@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     resend_api_key: str | None = None
     email_from: str
     google_client_id: str | None
+    shopify_client_id: str
+    shopify_client_secret: str
+    shopify_redirect_uri: str
+    shopify_api_version: str
+    shopify_token_encryption_key: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

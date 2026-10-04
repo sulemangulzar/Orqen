@@ -39,7 +39,7 @@ export function ResetPassword() {
         <Input label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
         <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Resetting...' : 'Reset password'}</Button>
       </form>
-      <button onClick={() => navigate('/login')} className="mt-6 w-full text-sm font-semibold text-teal-600 dark:text-teal-300">Back to login</button>
+      <button onClick={() => navigate('/login')} className="mt-6 w-full text-sm font-semibold text-[var(--brand-blue)]">Back to login</button>
     </AuthLayout>
   );
 }

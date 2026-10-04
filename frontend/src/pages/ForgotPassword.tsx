@@ -31,7 +31,7 @@ export function ForgotPassword() {
         <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="you@company.com" />
         <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Sending...' : 'Send reset link'}</Button>
       </form>
-      <button onClick={() => navigate('/login')} className="mt-6 w-full text-sm font-semibold text-teal-600 dark:text-teal-300">Back to login</button>
+      <button onClick={() => navigate('/login')} className="mt-6 w-full text-sm font-semibold text-[var(--brand-blue)]">Back to login</button>
     </AuthLayout>
   );
 }

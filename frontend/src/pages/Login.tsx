@@ -1,5 +1,6 @@
-import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { Alert } from '../components/Alert';
 import { AuthLayout } from '../components/AuthLayout';
 import { Button } from '../components/Button';
@@ -40,7 +41,7 @@ export function Login() {
   }
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to continue to your Orqen workspace.">
+    <AuthLayout title="Welcome back." subtitle="Sign in to continue where your team left off.">
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         {error && <Alert tone="error" message={error} />}
         <Input
@@ -68,13 +69,14 @@ export function Login() {
         <div className="flex justify-end">
           <button type="button" onClick={() => navigate('/forgot-password')} className="text-xs font-semibold text-[var(--brand-blue)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-blue)]">Forgot password?</button>
         </div>
-        <Button type="submit" className="w-full rounded-lg bg-[var(--navy-950)] py-3.5 hover:bg-[var(--navy-800)]" disabled={loading}>
+        <Button type="submit" className="w-full rounded-lg py-3.5" disabled={loading}>
           {loading ? 'Signing in…' : 'Sign in'}
         </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-        New to Orqen? <button type="button" onClick={() => navigate('/signup')} className="font-semibold text-[var(--brand-blue)] hover:underline">Create an account</button>
-      </p>
+      <div className="mt-5 flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-3 text-xs leading-5 text-[var(--text-muted)]">
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand-blue)]" />
+        Your workspace data stays tied to your authenticated Orqen account.
+      </div>
     </AuthLayout>
   );
 }

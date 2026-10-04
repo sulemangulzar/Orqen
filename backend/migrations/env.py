@@ -13,6 +13,7 @@ from app.models.organization import Organization
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.models.invitation import Invitation
+from app.integrations.shopify.models import ShopifyConnection, ShopifyOAuthState
 
 
 # this is the Alembic Config object, which provides
