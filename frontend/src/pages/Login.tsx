@@ -15,10 +15,11 @@ export function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [touched, setTouched] = useState({ email: false, password: false });
 
-  const emailError = submitted && !email.trim()
+  const emailError = (submitted || touched.email) && !email.trim()
     ? 'Enter your email address.'
-    : (submitted || email.length > 0) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    : (submitted || touched.email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
       ? 'Enter a valid email address.'
       : undefined;
 
@@ -52,6 +53,7 @@ export function Login() {
           inputMode="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          onBlur={() => setTouched((value) => ({ ...value, email: true }))}
           required
           placeholder="you@company.com"
           error={emailError}
@@ -62,9 +64,10 @@ export function Login() {
           autoComplete="current-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          onBlur={() => setTouched((value) => ({ ...value, password: true }))}
           required
           placeholder="Your password"
-          error={submitted && !password ? 'Enter your password.' : undefined}
+          error={(submitted || touched.password) && !password ? 'Enter your password.' : undefined}
         />
         <div className="flex justify-end">
           <button type="button" onClick={() => navigate('/forgot-password')} className="text-xs font-semibold text-[var(--brand-blue)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-blue)]">Forgot password?</button>

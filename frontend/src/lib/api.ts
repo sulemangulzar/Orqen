@@ -14,6 +14,16 @@ export type LoginResponse = AuthUser & {
   token_type: string;
 };
 
+export type Organization = {
+  id: string;
+  name: string;
+  slug: string;
+  plan: string;
+  subscription_status: string;
+  website: string | null;
+  company_size: string | null;
+};
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     credentials: 'include',
@@ -26,7 +36,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(data?.detail ?? 'Something went wrong');
+    const detail = data?.detail;
+    const message = Array.isArray(detail)
+      ? detail.map((item) => `${item.loc?.at(-1) ?? 'field'}: ${item.msg}`).join(', ')
+      : typeof detail === 'string'
+        ? detail
+        : 'Something went wrong';
+    throw new Error(message);
   }
   return data as T;
 }
@@ -49,6 +65,29 @@ export const api = {
 
   me: (accessToken: string) =>
     request<AuthUser>('/auth/me', { headers: { Authorization: `Bearer ${accessToken}` } }),
+
+  createOrganization: (accessToken: string, payload: { name: string }) =>
+    request<Organization>('/organizations', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify(payload),
+    }),
+
+  getOrganization: (accessToken: string) =>
+    request<Organization>('/organizations/me', { headers: { Authorization: `Bearer ${accessToken}` } }),
+
+  connectShopify: (accessToken: string, shopDomain: string) =>
+    request<{ authorization_url: string }>('/integrations/shopify/connect', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ shop_domain: shopDomain }),
+    }),
+
+  getShopifyStatus: (accessToken: string) =>
+    request<{ connected: boolean; shop_domain: string | null; status: string | null; scopes: string | null }>(
+      '/integrations/shopify/status',
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    ),
 
   forgotPassword: (email: string) =>
     request<{ message: string }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),

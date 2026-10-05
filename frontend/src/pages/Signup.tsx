@@ -6,6 +6,7 @@ import { AuthLayout } from '../components/AuthLayout';
 import { Button } from '../components/Button';
 import { Input, PasswordInput } from '../components/Input';
 import { api } from '../lib/api';
+import { navigate } from '../lib/router';
 
 export function Signup() {
   const [fullName, setFullName] = useState('');
@@ -16,14 +17,15 @@ export function Signup() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [touched, setTouched] = useState({ name: false, email: false, password: false, confirmPassword: false });
 
-  const emailError = submitted && !email.trim()
+  const emailError = (submitted || touched.email) && !email.trim()
     ? 'Enter your email address.'
-    : (submitted || email.length > 0) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    : (submitted || touched.email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
       ? 'Enter a valid email address.'
       : undefined;
-  const passwordError = (submitted || password.length > 0) && password.length < 8 ? 'Use at least 8 characters.' : undefined;
-  const confirmError = (submitted || confirmPassword.length > 0) && confirmPassword !== password ? 'Passwords do not match.' : undefined;
+  const passwordError = (submitted || touched.password) && password.length < 8 ? 'Use at least 8 characters.' : undefined;
+  const confirmError = (submitted || touched.confirmPassword) && Boolean(confirmPassword) && confirmPassword !== password ? 'Passwords do not match.' : undefined;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -44,6 +46,20 @@ export function Signup() {
 
   return (
     <AuthLayout title="Create your Orqen account." subtitle="Start with a workspace built around customers, orders, ownership, and follow-through.">
+      {success ? (
+        <div className="py-6 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#eaf1ff] text-[var(--brand-blue)]">
+            <Check className="h-7 w-7" />
+          </div>
+          <h2 className="mt-6 font-serif text-3xl text-[var(--text-primary)]">Check your email.</h2>
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-[var(--text-muted)]">
+            We sent a confirmation link to <span className="font-semibold text-[var(--text-secondary)]">{email}</span>. Confirm your email before signing in.
+          </p>
+          <Button type="button" onClick={() => navigate('/login')} className="mt-7 rounded-lg px-6 py-3">
+            Go to sign in
+          </Button>
+        </div>
+      ) : <>
       <form onSubmit={onSubmit} noValidate className="grid gap-4 sm:grid-cols-2">
         {error && <div className="sm:col-span-2"><Alert tone="error" message={error} /></div>}
         {success && <div className="sm:col-span-2"><Alert tone="success" message={success} /></div>}
@@ -53,10 +69,11 @@ export function Signup() {
           autoComplete="name"
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
+          onBlur={() => setTouched((value) => ({ ...value, name: true }))}
           required
           maxLength={120}
           placeholder="Your full name"
-          error={submitted && !fullName.trim() ? 'Enter your name.' : undefined}
+          error={(submitted || touched.name) && !fullName.trim() ? 'Enter your name.' : undefined}
         />
         <Input
           label="Work email"
@@ -66,6 +83,7 @@ export function Signup() {
           inputMode="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          onBlur={() => setTouched((value) => ({ ...value, email: true }))}
           required
           placeholder="you@company.com"
           error={emailError}
@@ -76,6 +94,7 @@ export function Signup() {
           autoComplete="new-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          onBlur={() => setTouched((value) => ({ ...value, password: true }))}
           required
           minLength={8}
           placeholder="At least 8 characters"
@@ -88,6 +107,7 @@ export function Signup() {
           autoComplete="new-password"
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
+          onBlur={() => setTouched((value) => ({ ...value, confirmPassword: true }))}
           required
           placeholder="Enter your password again"
           error={confirmError}
@@ -104,6 +124,7 @@ export function Signup() {
           </span>
         ))}
       </div>
+      </>}
     </AuthLayout>
   );
 }
