@@ -14,6 +14,9 @@ from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.models.invitation import Invitation
 from app.integrations.shopify.models import ShopifyConnection, ShopifyOAuthState
+from app.models.membership import OrganizationMembership
+from app.models.assistant import Assistant
+from app.models.document import Document, DocumentVersion, AssistantDocument
 
 
 # this is the Alembic Config object, which provides
