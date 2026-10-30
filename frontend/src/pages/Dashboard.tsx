@@ -1,54 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, Check, Store } from 'lucide-react';
-import { Button } from '../components/Button';
-import { Logo } from '../components/Logo';
-import { ThemeToggle } from '../components/ThemeToggle';
-import { api, type Organization } from '../lib/api';
-import { clearAccessToken, getAccessToken } from '../lib/auth';
-import { navigate } from '../lib/router';
-
-type ShopifyStatus = { connected: boolean; shop_domain: string | null; status: string | null; scopes: string | null };
-
-export function Dashboard() {
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [shopify, setShopify] = useState<ShopifyStatus | null>(null);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const token = getAccessToken();
-    if (!token) { navigate('/login'); return; }
-    Promise.all([api.getOrganization(token), api.getShopifyStatus(token)])
-      .then(([org, status]) => { setOrganization(org); setShopify(status); })
-      .catch((reason) => { setError(reason instanceof Error ? reason.message : 'Could not load your workspace.'); });
-  }, []);
-
-  async function logout() {
-    await api.logout().catch(() => null);
-    clearAccessToken();
-    navigate('/');
-  }
-
-  return (
-    <main className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-white">
-      <header className="border-b border-slate-200 bg-white/90 dark:border-white/10 dark:bg-slate-950/90">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Logo />
-          <div className="flex items-center gap-3"><ThemeToggle /><Button variant="secondary" onClick={logout}>Logout</Button></div>
-        </div>
-      </header>
-      <section className="mx-auto max-w-6xl px-6 py-12">
-        <div className="flex flex-wrap items-end justify-between gap-5">
-          <div><p className="text-sm font-semibold text-[var(--brand-blue)]">Workspace overview</p><h1 className="mt-2 text-4xl font-semibold tracking-tight">{organization?.name ?? 'Loading workspace…'}</h1><p className="mt-3 text-slate-600 dark:text-slate-400">Your organization is ready for the next operational step.</p></div>
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">{organization?.plan ?? 'free'} plan</span>
-        </div>
-        {error && <p role="alert" className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[.04]"><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-400">Workspace</p><p className="mt-4 text-lg font-semibold">{organization?.name ?? '—'}</p><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">/{organization?.slug ?? '—'}</p></article>
-          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[.04]"><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-400">Subscription</p><p className="mt-4 text-lg font-semibold capitalize">{organization?.plan ?? 'Free'}</p><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{organization?.subscription_status ?? 'Active'}</p></article>
-          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[.04]"><div className="flex items-center justify-between"><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-400">Shopify</p><Store className="h-4 w-4 text-[var(--brand-blue)]" /></div><p className="mt-4 text-lg font-semibold">{shopify?.connected ? shopify.shop_domain : 'Not connected'}</p><p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">{shopify?.connected ? <><Check className="h-3.5 w-3.5 text-[var(--brand-blue)]" /> Connected</> : 'Connect from onboarding'}</p></article>
-        </div>
-        <div className="mt-8 rounded-2xl bg-[var(--navy-950)] p-7 text-white"><p className="text-xs font-semibold uppercase tracking-[.14em] text-[#a9c2ff]">Next step</p><h2 className="mt-3 text-2xl font-semibold">Keep your operations in one place.</h2><p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">Your workspace identity and Shopify connection are now ready to power the next dashboard views.</p><button type="button" onClick={() => navigate('/')} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-[#a9c2ff]">View landing page <ArrowRight className="h-4 w-4" /></button></div>
-      </section>
-    </main>
-  );
-}
+import { Bot, FileText, LayoutDashboard, LogOut, MessageSquare, Settings } from 'lucide-react';
+import { Button } from '../components/Button'; import { Logo } from '../components/Logo'; import { ThemeToggle } from '../components/ThemeToggle'; import { AssistantPanel } from '../components/AssistantPanel'; import { KnowledgePanel } from '../components/KnowledgePanel'; import { ConversationPanel } from '../components/ConversationPanel'; import { OverviewAnalytics } from '../components/OverviewAnalytics'; import { api, type Organization } from '../lib/api'; import { clearAccessToken, getAccessToken } from '../lib/auth'; import { navigate, usePathname } from '../lib/router';
+const nav = [['/dashboard','Overview',LayoutDashboard],['/dashboard/knowledge','Knowledge base',FileText],['/dashboard/assistants','Assistants',Bot],['/dashboard/conversations','Conversations',MessageSquare],['/dashboard/settings','Settings',Settings]] as const;
+function Skeleton({ page }: { page: string }) { if (page === '/dashboard/knowledge') return <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6"><div className="h-7 w-48 rounded bg-slate-200" /><div className="mt-6 h-12 w-44 rounded-xl bg-slate-200" /><div className="mt-8 space-y-4">{[1,2,3,4].map((item)=><div key={item} className="h-12 rounded-xl bg-slate-100" />)}</div></div>; if (page === '/dashboard/assistants') return <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6"><div className="flex justify-between"><div className="h-7 w-64 rounded bg-slate-200" /><div className="h-10 w-36 rounded-xl bg-slate-200" /></div><div className="mt-8 grid gap-5 lg:grid-cols-[220px_1fr]"><div className="h-64 rounded-xl bg-slate-100" /><div className="h-64 rounded-xl bg-slate-100" /></div></div>; if (page === '/dashboard/conversations') return <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6"><div className="h-7 w-52 rounded bg-slate-200" /><div className="mt-7 grid gap-5 lg:grid-cols-2"><div className="h-72 rounded-xl bg-slate-100" /><div className="h-72 rounded-xl bg-slate-100" /></div></div>; if (page === '/dashboard/settings') return <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-8"><div className="h-7 w-52 rounded bg-slate-200" /><div className="mt-6 h-24 rounded-xl bg-slate-100" /></div>; return <div className="animate-pulse space-y-5"><div className="h-40 rounded-3xl bg-slate-200" /><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[1,2,3,4].map((item) => <div key={item} className="h-28 rounded-2xl bg-slate-200" />)}</div></div>; }
+export function Dashboard() { const page = usePathname().split('?')[0]; const [org,setOrg]=useState<Organization|null>(null); const [loading,setLoading]=useState(true); const [error,setError]=useState(''); const token=getAccessToken(); useEffect(()=>{if(!token){navigate('/login');return;} api.getOrganization(token).then(setOrg).catch(e=>setError(e instanceof Error?e.message:'Could not load workspace.')).finally(()=>setLoading(false));},[]); async function logout(){await api.logout().catch(()=>null);clearAccessToken();navigate('/');} const title=nav.find(([path])=>path===page)?.[1]??'Overview'; return <main className="min-h-screen bg-slate-50"><header className="fixed inset-x-0 top-0 z-20 h-16 border-b border-slate-200 bg-white"><div className="flex h-full items-center justify-between px-5"><Logo size="sm"/><div className="flex items-center gap-3"><ThemeToggle/><span className="hidden text-sm text-slate-600 sm:block">{org?.name??'Workspace'}</span><Button variant="secondary" onClick={logout}><LogOut className="h-4 w-4"/>Log out</Button></div></div></header><div className="flex pt-16"><aside className="fixed hidden h-[calc(100vh-4rem)] w-60 border-r border-slate-200 bg-white p-4 lg:block"><p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Workspace</p>{nav.map(([path,label,Icon])=><button key={path} onClick={()=>navigate(path)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold ${page===path?'bg-blue-50 text-[var(--brand-blue)]':'text-slate-600 hover:bg-slate-50'}`}><Icon className="h-4 w-4"/>{label}</button>)}</aside><section className="w-full px-5 py-8 lg:ml-60 lg:px-10"><div className="mx-auto max-w-6xl"><p className="text-sm text-slate-500">Orqen workspace</p><h1 className="mt-1 mb-8 text-3xl font-semibold">{title}</h1>{error&&<p className="mb-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}{loading?<Skeleton page={page}/>:org&&page==='/dashboard/knowledge'?<KnowledgePanel organizationId={org.id}/>:org&&page==='/dashboard/assistants'?<AssistantPanel organizationId={org.id}/>:org&&page==='/dashboard/conversations'?<ConversationPanel organizationId={org.id}/>:org&&page==='/dashboard/settings'?<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"><h2 className="text-lg font-semibold">Workspace settings</h2><p className="mt-2 text-sm text-slate-500">{org.name} · {org.plan} plan</p></div>:org?<><div className="rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white shadow-lg"><p className="text-sm text-blue-100">Welcome back</p><h2 className="mt-2 text-3xl font-semibold">Build better support with Orqen.</h2><p className="mt-3 text-sm text-blue-100">Upload knowledge, create assistants, and keep answers grounded.</p><div className="mt-6 flex gap-3"><button onClick={()=>navigate('/dashboard/knowledge')} className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-700">Upload knowledge</button><button onClick={()=>navigate('/dashboard/assistants')} className="rounded-xl border border-white/30 px-4 py-2.5 text-sm font-semibold">Create assistant</button></div></div><OverviewAnalytics organizationId={org.id}/></>:null}</div></section></div></main>; }

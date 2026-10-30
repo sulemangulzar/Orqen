@@ -9,6 +9,7 @@ class Document(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     organization_id: UUID = Field(foreign_key="organizations.id", index=True)
+    collection_id: UUID | None = Field(default=None, foreign_key="knowledge_collections.id", index=True)
     uploaded_by: UUID = Field(foreign_key="users.id", index=True)
     filename: str = Field(max_length=255)
     mime_type: str = Field(max_length=120)

@@ -9,6 +9,7 @@ class Assistant(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     organization_id: UUID = Field(foreign_key="organizations.id", index=True)
+    collection_id: UUID | None = Field(default=None, foreign_key="knowledge_collections.id", index=True)
     public_slug: str = Field(index=True, unique=True, max_length=150)
     title: str = Field(default="Support assistant", max_length=150)
     greeting: str = Field(default="How can we help?", max_length=1000)

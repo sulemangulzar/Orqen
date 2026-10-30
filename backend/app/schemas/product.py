@@ -29,14 +29,17 @@ class InvitationResponse(BaseModel):
 
 
 class AssistantCreate(BaseModel):
+    collection_id: UUID | None = None
     title: str = Field(default="Support assistant", min_length=2, max_length=150)
     public_slug: str | None = Field(default=None, max_length=150)
     greeting: str = Field(default="How can we help?", max_length=1000)
     fallback_response: str = Field(default="I don't have enough information to answer that.", max_length=2000)
     support_email: EmailStr | None = None
+    document_ids: list[UUID] = Field(default_factory=list)
 
 
 class AssistantUpdate(BaseModel):
+    document_ids: list[UUID] | None = None
     title: str | None = Field(default=None, min_length=2, max_length=150)
     public_slug: str | None = Field(default=None, max_length=150)
     greeting: str | None = Field(default=None, max_length=1000)
@@ -54,6 +57,7 @@ class AssistantResponse(BaseModel):
     fallback_response: str
     support_email: str | None
     status: str
+    document_ids: list[UUID] = Field(default_factory=list)
 
 
 class DocumentCreate(BaseModel):

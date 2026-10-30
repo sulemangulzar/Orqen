@@ -6,6 +6,9 @@ from app.models.invitation import Invitation
 from app.models.membership import OrganizationMembership
 from app.models.assistant import Assistant
 from app.models.document import Document, DocumentVersion, AssistantDocument
+from app.models.knowledge import DocumentChunk
+from app.models.conversation import Conversation, ConversationMessage
+from app.models.collection import KnowledgeCollection
 
 
-__all__ = ["AuthProvider", "Organization", "RefreshToken", "User", "PlanTier", "SubscriptionStatus", "UserRole", "Invitation", "InvitationStatus", "OrganizationMembership", "Assistant", "Document", "DocumentVersion", "AssistantDocument"]
+__all__ = ["AuthProvider", "Organization", "RefreshToken", "User", "PlanTier", "SubscriptionStatus", "UserRole", "Invitation", "InvitationStatus", "OrganizationMembership", "Assistant", "Document", "DocumentVersion", "AssistantDocument", "DocumentChunk", "Conversation", "ConversationMessage", "KnowledgeCollection"]

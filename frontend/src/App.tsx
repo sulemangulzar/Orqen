@@ -7,9 +7,12 @@ import { Onboarding } from './pages/Onboarding';
 import { ResetPassword } from './pages/ResetPassword';
 import { Signup } from './pages/Signup';
 import { usePathname } from './lib/router';
+import { PublicSupport } from './pages/PublicSupport';
 
 export function App() {
   const route = usePathname().split('?')[0];
+
+  if (route.startsWith('/support/')) return <PublicSupport slug={decodeURIComponent(route.slice('/support/'.length))} />;
 
   if (route === '/signup') return <Signup />;
   if (route === '/confirm-email') return <ConfirmEmail />;
@@ -17,7 +20,7 @@ export function App() {
   if (route === '/forgot-password') return <ForgotPassword />;
   if (route === '/reset-password') return <ResetPassword />;
   if (route === '/onboarding') return <Onboarding />;
-  if (route === '/dashboard') return <Dashboard />;
+  if (route === '/dashboard' || route.startsWith('/dashboard/')) return <Dashboard />;
 
   return <Landing />;
 }

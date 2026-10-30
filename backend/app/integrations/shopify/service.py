@@ -56,6 +56,10 @@ def encrypt_token(token: str) -> str:
     return Fernet(settings.shopify_token_encryption_key.encode()).encrypt(token.encode()).decode()
 
 
+def decrypt_token(token: str) -> str:
+    return Fernet(settings.shopify_token_encryption_key.encode()).decrypt(token.encode()).decode()
+
+
 def exchange_code_for_token(shop: str, code: str) -> dict:
     payload = json.dumps({
         "client_id": settings.shopify_client_id,
